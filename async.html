@@ -8,6 +8,7 @@
 <!---
 async 基本
   返回promise对象  可以使用then方法添加回调函数，当函数遇到await就会先返回，等到异步操作完成，再接着执行函数体后面的语句
+  await后面需要是promist函数  如果是普通函数会直接执行
   --->
 <script>
   async function getTime() {
@@ -30,6 +31,7 @@ async 基本
 </script>
 <!---
   async  then  处理
+  普通方法
 --->
 <script>
    function getSomeString() {
@@ -59,5 +61,45 @@ async 基本
   // printSome()
 
 </script>
+<!---
+  async  then  处理
+  依次处理多个
+--->
+<script>
+    async   function getString(numb) {
+        return    new Promise((resolve,reject)=>{
+            setTimeout(resolve,1000,numb)
+        })
+    }
+    let arry=['1','2','3']
+//     arry.forEach(async (item)=>{
+//         await   getString(item).then(result=>{
+//             console.log(result)
+//         })
+//     })//依次打印1 2 3
+</script>
+<!---
+     async    all  处理
+     同时处理多个 同步返回
+     上次遇到返回多个undefined 被合并成一个  暂时忘记怎么回事了
+ --->
+<script>
+
+    async   function getString2(numb) {
+        return    new Promise((resolve,reject)=>{
+            setTimeout(resolve,1000,numb)
+        })
+    }
+//    //第一种写法
+//     Promise.all([getString('1'),getString('2')]).then(result=>{
+//         console.log(result)
+//     })
+//    Promise.all([getString(1),getString(),getString(),getString(),getString(2)]).then(result=>{
+//        result.forEach((item=>{
+//            console.log(item)
+//        }))
+//    })
+</script>
+<!---   待继续补充--->
 </body>
 </html>
