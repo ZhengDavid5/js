@@ -26,7 +26,37 @@ async 基本
       console.log("打印")
   }//此函数会先打印3s后  再显示打印
   //getTime()
-  getTimeForAwait()
+  // getTimeForAwait()
+</script>
+<!---
+  async  then  处理
+--->
+<script>
+   function getSomeString() {
+     return  new Promise((resolve,reject)=>{
+         setTimeout(resolve,3000,"3s后拿到值")
+     })
+ }
+   function getErrorString() {
+       return   new Promise((resolve,reject)=>{
+           throw new Error("错误")
+       })
+   }
+  async  function printSome() {
+       console.log("先取某个值")
+      await getSomeString().then(result=>{
+          console.log("取到的东西:"+result)
+      }).catch(e=>{
+          conso.log(e)
+      })
+
+      await getErrorString().then(result=>{
+          console.log("取到的东西:"+result)
+      }).catch(e=>{
+          console.log("捕捉到异常"+e)
+      })
+   }
+  // printSome()
 
 </script>
 </body>
