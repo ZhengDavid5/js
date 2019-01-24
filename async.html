@@ -5,6 +5,29 @@
     <title>Title</title>
 </head>
 <body>
+<!---
+async 基本
+  返回promise对象  可以使用then方法添加回调函数，当函数遇到await就会先返回，等到异步操作完成，再接着执行函数体后面的语句
+  --->
+<script>
+  async function getTime() {
+    console.log("---getTime")
+      await  setTimeout(()=>{
+              console.log("3s后")
+          },3000)
+      console.log("打印")
+  }//此函数调用会先直接先出现 打印  ,再出现3s后  因为await后
+  async function getTimeForAwait() {
+      console.log("---getTime")
+      await new Promise((resolve,reject)=>{
+          debugger
+          setTimeout(resolve,3000)   //setTime  第一个参数接受functon  type判断了下resolve为方法 resolve为调用
+      })
+      console.log("打印")
+  }//此函数会先打印3s后  再显示打印
+  //getTime()
+  getTimeForAwait()
 
+</script>
 </body>
 </html>
