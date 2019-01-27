@@ -127,8 +127,171 @@
 
 
 </script>
+ 5  </br>
+    Symbol()     调用30个会返回30个</br>
+    Symbol.for()  会生成新的Symbol在全局中  如果存在则不创建，会返回那个  如果不存在则创建 调用30次只会返回一个 都相同</br>
+    Symbol.keyFor()  参数是Symbol类型不是key 返回已登记的 Symbol 类型值的key。  查找 Symbol.for()注册的  symbol的不算是</br>
+    demo</br>
+    let temp5=Symbol('temp5')</br>
+    let temp5_1=Symbol('temp5')</br>
+    Symbol.keyFor(temp5)//undefined</br>
+    let temp5_2=Symbol.for('temp5')</br>
+    let temp5_3=Symbol.for('temp5')</br>
+    Symbol.keyFor(temp5_2)//temp5</br>
+    console.log(temp5==temp5_1)//false</br>
+    console.log(temp5_1==temp5_2)//false</br>
+    console.log(temp5==temp5_2)//false</br>
+    console.log(temp5_2==temp5_3)//true</br>
+    <script>
+    let temp5=Symbol('temp5')
+    let temp5_1=Symbol('temp5')
+    Symbol.keyFor(temp5)//undefined
+    let temp5_2=Symbol.for('temp5')
+    let temp5_3=Symbol.for('temp5')
+    Symbol.keyFor(temp5_2)//temp5
+    console.log(temp5==temp5_1)//false
+    console.log(temp5_1==temp5_2)//false
+    console.log(temp5==temp5_2)//false
+    console.log(temp5_2==temp5_3)//true
+</script>
+  6  实例：模块的 Singleton 模式  没有完全理解</br>
+    const FOO_KEY = Symbol.for('foo');</br>
+    function A() {</br>
+    this.foo = 'hello';</br>
+    }</br>
+    if (!global[FOO_KEY]) {</br>
+    global[FOO_KEY] = new A();</br>
+    }</br>
+    module.exports = global[FOO_KEY];</br>
+    <script>
+    </script>
+    </br>  7  内置的Symbol值  除了定义自己使用的 Symbol 值以外，ES6 还提供了 11 个内置的 Symbol 值，指向语言内部使用的方法。 </br>
+   7.1 Symbol.hasInstance</br>
+    class MyClass{</br>
+    [Symbol.hasInstance](foo){</br>
+    return  foo instanceof  Array</br>
+    }</br>
+    }</br>
+    console.log("demo7:")</br>
+    console.log([1,2,3] instanceof  new MyClass())//true</br>
+    <script>
+        class MyClass{
+            [Symbol.hasInstance](foo){
+                return  foo instanceof  Array
+            }
+        }
+        console.log("demo7:")
+        console.log([1,2,3] instanceof  new MyClass())//true
+    </script>
+    7.2Symbol.isConcatSpreadable</br>
+    对象的Symbol.isConcatSpreadable属性等于一个布尔值，表示该对象用于Array.prototype.concat()时，是否可以展开</br>
+    let obj = {length: 2, 0: 'c', 1: 'd'};</br>
+    ['a', 'b'].concat(obj, 'e') // ['a', 'b', obj, 'e']</br>
+    obj[Symbol.isConcatSpreadable] = true;</br>
+    ['a', 'b'].concat(obj, 'e') // ['a', 'b', 'c', 'd', 'e']</br>
+
+</br>  7.3.Symbol.species</br>
+有些类库是在基类的基础上修改的，那么子类使用继承的方法时，作者可能希望返回基类的实例，而不是子类的实例。</br>
+class T1 extends Promise {</br>
+}</br>
+class T2 extends Promise {</br>
+static get [Symbol.species]() {</br>
+return Promise;</br>
+}</br>
+}</br>
+console.log("demo9")</br>
+console.log(new T1((r=>r())).then(v=>v) instanceof T1)//true</br>
+console.log(new T2((r=>r())).then(v=>v) instanceof T2)//false</br></br>
+<script>
+    class T1 extends Promise {
+    }
+    class T2 extends Promise {
+        static get [Symbol.species]() {
+            return Promise;
+        }
+    }
+    console.log("demo9")
+    console.log(new T1((r=>r())).then(v=>v) instanceof T1)//true
+    console.log(new T2((r=>r())).then(v=>v) instanceof T2)//false
+ </script>
+
+7.4  Symbol.match</br>
+    let obj = {</br>
+    [Symbol.match](string) {</br>
+    return "heheda";</br>
+    }</br>
+    };;</br>
+    console.log("strstring".match(obj));//heheda</br>
+<script>
+    let obj = {
+        [Symbol.match](string) {
+            debugger
+            return "heheda";
+        }
+    };;
+    console.log("strstring".match(obj));
+
+</script>
+7.5   Symbol.replace</br>
+    对象的Symbol.replace属性，指向一个方法，当该对象被String.prototype.replace方法调用时，会返回该方法的返回值。</br>
+    Symbol.replace方法会收到两个参数，第一个参数是replace方法正在作用的对象，上面例子是Hello，第二个参数是替换后的值，上面例子是World。</br>
+    const x = {</br>
+    [Symbol.replace](...s){</br>
+    console.log(s)</br>
+    }</br>
+    };</br>
+    'Hello'.replace(x, 'World') // ["Hello", "World"]</br>
+<script>
+    const x = {
+        [Symbol.replace](...s){
+            console.log(s)
+        }
+    };
+    'Hello'.replace(x, 'World') // ["Hello", "World"]
+</script>
+  7.6  剩余的可见es入门http://es6.ruanyifeng.com/</br>
+    Symbol.search</br>
+    对象的Symbol.search属性，指向一个方法，当该对象被String.prototype.search方法调用时，会返回该方法的返回值。</br>
+       Symbol.split 对象的Symbol.split属性，指向一个方法，当该对象被String.prototype.split方法调用时，会返回该方法的返回值</br>
+    Symbol.iterator</br>
+    Symbol.toPrimitive   对象的Symbol.toPrimitive属性，指向一个方法。该对象被转为原始类型的值时，会调用这个方法，返回该对象对应的原始类型值</br>
+    Symbol.toStringTag   对象的Symbol.toStringTag属性，指向一个方法。在该对象上面调用Object.prototype.toString方法时，如果这个属性存在，它的返回值会出现在toString方法返回的字符串之中，表示对象的类型。也就是说，这个属性可以用来定制[object Object]或[object Array]中object后面的那个字符串。</br>
+    Symbol.unscopables   对象的Symbol.unscopables属性，指向一个对象。该对象指定了使用with关键字时，哪些属性会被with环境排除。
 
 
+    Symbol.search  demo </br>
+    String.prototype.search(regexp)</br>
+    // 等同于</br>
+    regexp[Symbol.search](this)</br>
+
+    class MySearch {</br>
+    constructor(value) {</br>
+    this.value = value;</br>
+    }</br>
+    [Symbol.search](string) {</br>
+    return string.indexOf(this.value);</br>
+    }</br>
+    }</br>
+    'foobar'.search(new MySearch('foo')) // 0</br>
+
+    Symbol.search  demo</br>
+    class Collection {</br>
+    *[Symbol.iterator]() {</br>
+    let i = 0;</br>
+    while(this[i] !== undefined) {</br>
+    yield this[i];</br>
+    ++i;</br>
+    }</br>
+    }</br>
+    }</br>
+
+    let myCollection = new Collection();</br>
+    myCollection[0] = 1;</br>
+    myCollection[1] = 2;</br>
+
+    for(let value of myCollection) {</br>
+    console.log(value);</br>
+    }</br>
 </head>
 <body>
 <script>
