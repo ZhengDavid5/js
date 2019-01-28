@@ -5,20 +5,144 @@
     <title>Title</title>
 </head>
 <body>
+Proxy  原意为代理
+修改某些操作的默认行为，在目标对象前架设一层拦截，外界对对象的访问都必须先通过这层的拦截，对外界的访问进行过滤和改写，</br>
 
+demo  重写了get和set的方法</br>
+var obj = new Proxy({}, {</br>
+get: function (target, key, receiver) {</br>
+console.log(`getting ${key}!`);</br>
+return Reflect.get(target, key, receiver);</br>
+},</br>
+set: function (target, key, value, receiver) {</br>
+console.log(`setting ${key}!`);</br>
+return Reflect.set(target, key, value, receiver);</br>
+}</br>
+});</br>
+obj.count = 1</br>
+//  setting count!</br>
+++obj.count</br>
+//  getting count!</br>
+//  setting count!</br>
+//  2</br>
+</br>
+一 基础语法</br>
+Proxy接受两个参数</br>
+第一个参数是所要代理的目标对象（上例是一个空对象），即如果没有Proxy的介入，操作原来要访问的就是这个对象；</br>
+第二个参数是一个配置对象，对于每一个被代理的操作，需要提供一个对应的处理函数，该函数将拦截对应的操作</br>
+demo1:如果handle没有进行任何处理 相当与在原对象进行处理</br>
+let target={};</br>
+let handle={}</br>
+let proxy=new   Proxy(target,handle)</br>
+proxy.a='b'</br>
+console.log(target.a)//b</br>
+demo2</br>
+let target={};</br>
+let handle={}</br>
+let proxy=new   Proxy(target,handle)</br>
+proxy.a='b'</br>
+
+console.log("demo1"+target.a)//b</br>
+
+let  handler={</br>
+get:function (target,name) {</br>
+if(name==='prototype'){</br>
+return Object.prototype</br>
+}</br>
+return'hello, '+name;</br>
+},</br>
+apply:function (target,thisBingding,args) {</br>
+return args[0];</br>
+},</br>
+construct:function (target,args) {</br>
+return {value:args[1]}</br>
+}</br>
+
+}</br>
+let fproxy=new Proxy(function (x,y) {</br>
+return x+y;</br>
+},handler);</br>
+fproxy(1, 2) // 1</br>
+new fproxy(1, 2) // {value: 2}</br>
+fproxy.prototype === Object.prototype // true</br>
+fproxy.foo === "Hello, foo" // true</br>
 <script>
-    let obj=new Proxy({},{
-        get:function (target,key,receiver) {
-            console.log(`getting${key}!`);
-            return Reflect.get(target, key, receiver);
-        },
-        set:function (target,key,value,receiver) {
-            console.log(`setting:${key}+value:${value}`)
-        return Reflect.set(target,key,value,receiver)
+let target={};
+let handle={}
+let proxy=new   Proxy(target,handle)
+proxy.a='b'
+
+ console.log("demo1"+target.a)//b
+
+let  handler={
+    get:function (target,name) {
+        if(name==='prototype'){
+            return Object.prototype
         }
-    })
-    obj.count=1
-    ++obj.count
+        return'hello, '+name;
+    },
+    apply:function (target,thisBingding,args) {
+        return args[0];
+    },
+    construct:function (target,args) {
+        return {value:args[1]}
+    }
+
+}
+let fproxy=new Proxy(function (x,y) {
+return x+y;
+},handler);
+fproxy(1, 2) // 1
+new fproxy(1, 2) // {value: 2}
+fproxy.prototype === Object.prototype // true
+fproxy.foo === "Hello, foo" // true
+
+</script>
+二.Proxy 支持的拦截操作一览</br>
+get(target, propKey, receiver)：拦截对象属性的读取，比如proxy.foo和proxy['foo']。</br>
+set(target, propKey, value, receiver)：拦截对象属性的设置，比如proxy.foo = v或proxy['foo'] = v，返回一个布尔值。</br>
+
+三.Proxy.revocable方法返回一个可取消的 Proxy 实例。</br>
+let target = {};</br>
+let handler = {};</br>
+
+let {proxy, revoke} = Proxy.revocable(target, handler);  //返回一个对象，该对象的proxy属性是Proxy实例，revoke属性是一个函数，可以取消Proxy实例</br>
+//proxy  revoke 不能换成其他</br>
+proxy.foo = 123;</br>
+proxy.foo // 123</br>
+revoke();</br>
+proxy.foo // TypeError: Revoked</br>
+<script>
+//    let target = {};
+//    let handler = {};
+//    let {proxy, revoke} = Proxy.revocable(target, handler);
+//    proxy.foo = 123;
+//    proxy.foo // 123
+//    revoke();
+//    proxy.foo // TypeError: Revoked
+
+</script>
+ 四 this 问题</br>
+主要原因就是在 Proxy 代理的情况下，目标对象内部的this关键字会指向 Proxy 代理。</br>
+const target4 = {</br>
+m: function () {</br>
+console.log(this === proxy4);</br>
+}</br>
+};</br>
+const handler4 = {};</br>
+let proxy4 = new Proxy(target4, handler4);</br>
+target4.m() // false</br>
+proxy4.m()  // true</br>
+<script>
+    const target4 = {
+        m: function () {
+            console.log(this === proxy4);
+        }
+    };
+    const handler4 = {};
+    let proxy4 = new Proxy(target4, handler4);
+    target4.m() // false
+    proxy4.m()  // true
 </script>
 </body>
 </html>
