@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+Reflect
+为操作对象提供的新api，可以拿到语言内部的方法</br>
+一. 设计目的：</br>
+1.将Object对象的一些明显属于语言内部的方法（比如Object.defineProperty）,方法哦reflect中，当前某些方法会在object和reflect中共同</br>
+存在，后续新的方法都只会在reflect对象中</br>
+2.修改object方法中的返回结果，让其更合理</br>
+3.让object操作都变成函数行为，某些Object操作是命令式，比如name in obj和delete obj[name]，而Reflect.has(obj, name)和Reflect.deleteProperty(obj, name)让它们变成了函数行为</br>
+4.reflect对象的方法与proxy对象的方法一一对应，只要proxy对象的方法，就能在reflect对象上找到对应的方法。这就让proxy对象可以</br>
+可以方面的调用对象的方法，完成默认的行为，作为修改行为的基础，不管proxy怎么修改默认行，你总可以在reflect上获取默认行为</br>
+<script>
+    let obj1={}
+    let  temp1=new Proxy(obj1,{
+        set:function (target,name,value,receiver) {
+            let success=Reflect.set(target,name,value,receiver);
+            if(success){
+                console.log(`property ${name} on  ${target}  set  to ${value}`)
+            }
+            return  success
+        }
+    })
+    temp1.a="a"//property a on  [object Object]  set  to a
+    obj1.a="a"//没有调用set
+</script>
+二. 静态方法</br>
+Reflect对象一共有 13 个静态方法。
+</br>
+Reflect.apply(target, thisArg, args)</br>
+Reflect.construct(target, args)</br>
+Reflect.get(target, name, receiver)</br>
+Reflect.set(target, name, value, receiver)</br>
+Reflect.defineProperty(target, name, desc)</br>
+Reflect.deleteProperty(target, name)</br>
+Reflect.has(target, name)</br>
+Reflect.ownKeys(target)</br>
+Reflect.isExtensible(target)</br>
+Reflect.preventExtensions(target)</br>
+Reflect.getOwnPropertyDescriptor(target, name)</br>
+Reflect.getPrototypeOf(target)</br>
+Reflect.setPrototypeOf(target, prototype)</br>
+上面这些方法的作用，大部分与Object对象的同名方法的作用都是相同的，而且它与Proxy对象的方法是一一对应的。下面是对它们的解释。</br>
+</body>
+2.1</br>
+Reflect.get(target, name, receiver)</br>
+<script>
+    let myObject={
+        foo:1,
+        getFoo(){
+            return  this.foo
+        },
+        get baz(){
+            return  this.foo
+        }
+    }
+    let myReceiveObject={
+        foo:2
+    }
+    console.log(Reflect.get(myObject,'foo')) //1
+    console.log(Reflect.get(myObject,'foo',myReceiveObject))//1
+    console.log(Reflect.get(myObject,'getFoo',myReceiveObject))//ƒ getFoo(){return  this.foo}
+    console.log(Reflect.get(myObject,'baz',myReceiveObject))//部署了读取函数（getter）,则读取函数的this绑定receiver
+</script>
+2.2  Reflect.set(target, name, value, receiver)</br>
+<script>
+let  myObject2={
+    foo:1,
+    set bar(value){
+       return  this.foo=value
+    }
+}
+let myReceiveObject2={
+    foo:2
+}
+console.log("2.2 set :"+myObject2.foo)//
+console.log( Reflect.set(myObject2,'bar',2))
+console.log("2.2 Reflect set :"+myObject2.foo)//2.2 Reflect set :2
+console.log("2.2 "+Reflect.set(myObject2,'bar',4,myReceiveObject2))//2.2 true
+console.log("2.2_"+myObject2.foo)//2.2_2
+console.log("2.2_"+myReceiveObject2.foo)//2.2_4
+
+let p = {
+    a: 'a'
+};
+
+let handler = {
+    set(target, key, value, receiver) {
+        console.log('set');
+        Reflect.set(target, key, value, receiver)
+        //写receiver 就说明Reflect.set是调用obj里面的，就会触发obj defineProperty
+        // 如果不写的话就不会调用定义在 obj里面的
+    },
+    defineProperty(target, key, attribute) {//
+        console.log('defineProperty');
+        Reflect.defineProperty(target, key, attribute);
+    }
+};
+
+let obj = new Proxy(p, handler);
+obj.a = 'A';
+
+</script>
+2.3  Reflect.has(obj, name)</br>
+var myObject = {</br>
+foo: 1,</br>
+};</br>
+// 旧写法</br>
+'foo' in myObject // true</br>
+// 新写法</br>
+Reflect.has(myObject, 'foo') // true</br>
+2.4  Reflect.deleteProperty(obj, name)</br>
+该方法返回一个布尔值。如果删除成功，或者被删除的属性不存在，返回true；删除失败，被删除的属性依然存在，返回false。</br>
+2.5  Reflect.construct(target, args)</br>
+const instance5 = Reflect.construct(Greeting, ['张三','22']);</br>
+<script>
+    function Greeting(name,age) {
+        this.name = name;
+        this.age = age;
+    }
+    // new 的写法
+    const instance = new Greeting('张三');
+    // Reflect.construct 的写法
+    const instance5 = Reflect.construct(Greeting, ['张三','22']);
+
+</script>
+2.6 Reflect.getPrototypeOf(obj)</br>
+function FancyThing() {</br>
+age=2</br>
+}</br>
+FancyThing.prototype.name="1"</br>
+const myObj = new FancyThing();</br>
+// 旧写法</br>
+console.log(Object.getPrototypeOf(myObj))  ;//{name: "1", constructor: ƒ}</br>
+<script>
+    function FancyThing() {age=2}
+    FancyThing.prototype.name="1"
+    const myObj = new FancyThing();
+    // 旧写法
+  console.log(Object.getPrototypeOf(myObj))  ;//{name: "1", constructor: ƒ}
+    // 新写法
+ console.log(Reflect.getPrototypeOf(myObj) === FancyThing.prototype)//true
+</script>
+2.7 Reflect.setPrototypeOf(obj, newProto)
+<script>
+    let myObj7={a:2}
+    Object.setPrototypeOf(myObj7,Array.prototype)
+    myObj7.pop()
+    console.log(myObj7)//["1", a: 2]
+
+</script>
+</html>
