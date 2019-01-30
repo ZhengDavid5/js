@@ -11,7 +11,7 @@
     </br>
     let s=Symbol()</br>
     console.log(typeof  s)
-    //symbol    </br></br>
+    //symbol    </br></br></br>
     <script>
         let demo1=Symbol()
         console.log("demo1"+typeof  demo1)
@@ -31,7 +31,7 @@
     let s1 = Symbol('foo');</br>
     s1.toString() // "Symbol(foo)"</br>
     const sym = Symbol(obj);</br>
-    sym // Symbol(abc)</br>
+    sym // Symbol(abc)</br></br></br>
     3.作为属性名的symbol基础用法     不能使用.运算符(例如xx.mySymbol )  let symbol = Symbol('size')typeof this[symbol] 为值 typeof size 为 symbol   注意  .后面只能接字符串
     用于对象的属性，保证不会出现相同的属性</br>
     命名方式</br>
@@ -53,7 +53,7 @@
     console.log("demo3"+demo3.mySymbol+"----"+typeof demo3.mySymbol)//demo3hello122----string</br>
     console.log("demo3"+demo3[mySymbol]+"----"+typeof demo3[mySymbol] )//demo3undefined----undefined</br>
     console.log("demo3"+demo3['mySymbol']+"----"+typeof demo3['mySymbol'])//demo3hello122----string</br>
-    </br>
+    </br></br></br>
 
 <script>
     let mySymbol=Symbol()
@@ -141,7 +141,7 @@
     console.log(temp5==temp5_1)//false</br>
     console.log(temp5_1==temp5_2)//false</br>
     console.log(temp5==temp5_2)//false</br>
-    console.log(temp5_2==temp5_3)//true</br>
+    console.log(temp5_2==temp5_3)//true</br></br></br>
     <script>
     let temp5=Symbol('temp5')
     let temp5_1=Symbol('temp5')
@@ -188,7 +188,7 @@
     let obj = {length: 2, 0: 'c', 1: 'd'};</br>
     ['a', 'b'].concat(obj, 'e') // ['a', 'b', obj, 'e']</br>
     obj[Symbol.isConcatSpreadable] = true;</br>
-    ['a', 'b'].concat(obj, 'e') // ['a', 'b', 'c', 'd', 'e']</br>
+    ['a', 'b'].concat(obj, 'e') // ['a', 'b', 'c', 'd', 'e']</br></br></br>
 
 </br>  7.3.Symbol.species</br>
 有些类库是在基类的基础上修改的，那么子类使用继承的方法时，作者可能希望返回基类的实例，而不是子类的实例。</br>
