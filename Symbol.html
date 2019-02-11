@@ -230,7 +230,8 @@ console.log(new T2((r=>r())).then(v=>v) instanceof T2)//false</br></br>
         }
     };;
     console.log("strstring".match(obj));
-
+   //另外的调用方法
+    console.log("-----"+obj[Symbol.match]('strstring'))
 </script>
 7.5   Symbol.replace</br>
     对象的Symbol.replace属性，指向一个方法，当该对象被String.prototype.replace方法调用时，会返回该方法的返回值。</br>
