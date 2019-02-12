@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+一.Generator 函数是 ES6 提供的一种异步编程解决方案</br>
+执行 Generator 函数会返回一个遍历器对象,返回的遍历器对象，可以依次遍历 Generator 函数内部的每一个状态。</br>
+两个特征:。一是，function关键字与函数名之间有一个星号；二是，函数体内部使用yield表达式，定义不同的内部状态（yield在英语里的意思就是“产出”）。</br>
+<script>
+    function* gen() {
+        yield  12+111;//yield后面的表达式123 + 456，不会立即求值，只会在next方法将指针移到这一句时，才会求值。
+        yield   111;
+        return  "222"
+    }
+    let genDemo=gen();
+    console.log(genDemo.next())//{value: 123, done: false}
+    console.log(genDemo.next())//{value: 111, done: false}
+    console.log(genDemo.next())//{value: "222", done: true}
+    console.log(genDemo.next())//{value: undefined, done: true}
+  </script>
+二.yield 表达式</br>
+yield表达式是暂停执行的标记</br>
+forEach方法的参数是一个普通函数   yield表达式不能存在于普通函数中</br>
+执行逻辑
+1.遇到yield表达式，就暂停执行后面的操作，并将紧跟在yield后面的那个表达式的值，作为返回的对象的value属性值
+2.下一次调用next方法时，再继续往下执行，直到遇到下一个yield表达式
+3.如果没有再遇到新的yield表达式，就一直运行到函数结束，直到return语句为止，并将return语句后面的表达式的值，作为返回的对象的value属性值。
+4.如果该函数没有return语句，则返回的对象的value属性值为undefined。
+    <script>
+//    function*  gen2(a) {  //forEach方法的参数是一个普通函数   yield表达式不能存在于普通函数中
+//        a.forEach((item)=>{
+//            yield item
+//        })
+//    }
+//    let arry=[1,2,3,4]
+   // let gen2Demo=gen2(arry)
+//    console.log(gen2Demo.next())//Uncaught SyntaxError: Unexpected identifier
+
+function*  gen3(a) {
+    for (let i=0;i<a.length;i++){
+        yield a[i]
+    }
+}
+let arry3=[1,2,3,4]
+let gen3Demo=gen3(arry3)
+console.log(gen3Demo.next())//{value: 1, done: false}
+console.log(gen3Demo.next())//{value: 2, done: false}
+console.log(gen3Demo.next().value)//3
+</script>
+
+三.与iterator 接口的关系</br>
+1.next 方法的参数</br>
+2.。next方法可以带一个参数，该参数就会被当作上一个yield表达式的返回值。</br>
+上面代码先定义了一个可以无限运行的 Generator 函数f，如果next方法没有参数，每次运行到yield表达式，变量reset的值总是undefined。当next方法带一个参数true时，变量reset就被重置为这个参数（即true），因此i会等于-1，下一轮循环就会从-1开始递增。</br>
+3.for...of 循环
+<script>
+    console.log("===============4")
+    let myIterator4={}
+    myIterator4[Symbol.iterator]=function*() {
+        yield 1
+        yield 2
+        yield 3
+        return  "4"  //一旦next方法的返回对象的done属性为true，for...of循环就会中止，且不包含该返回对象
+        return  "4"
+    }
+     for ( item  of myIterator4){
+        console.log(item)
+     }//1,2,3
+    console.log([...myIterator4])//(3) [1, 2, 3]
+    function* gen5() {
+        yield  12+111;//yield后面的表达式123 + 456，不会立即求值，只会在next方法将指针移到这一句时，才会求值。
+        yield   111;
+        return  "222"
+    }
+    //这个功能有很重要的语法意义。Generator 函数从暂停状态到恢复运行，它的上下文状态（context）是不变的。通过next方法的参数，就有办法在 Generator 函数开始运行之后，继续向函数体内部注入值。也就是说，可以在 Generator 函数运行的不同阶段，从外部向内部注入不同的值，从而调整函数行为
+    let demo5=gen5()
+    console.log( demo5.next())
+    console.log(demo5.next())
+    console.log(demo5.next())
+    console.log(demo5.next(2))
+
+    function* f() {
+        for(var i = 0; true; i++) {
+            var reset = yield i;//当i 返回 进行到1的时候  暂缓了这时候 reset 还没赋值  直到调用g.next(true)reset 为传来的 true 然后往下执行
+            if(reset) { i = -1; }
+        }
+    }
+    console.log("==========")
+    var g = f();
+    console.log(g.next() )// { value: 0, done: false }
+    console.log( g.next() )// { value: 1, done: false }
+    console.log(g.next(true)) // { value: 0, done: false }
+    console.log("==========")
+    function* foo(x) {
+        var y = 2 * (yield (x + 1));
+        var z = yield (y / 3);
+        return (x + y + z);
+    }
+
+    var a = foo(5);
+    a.next() // Object{value:6, done:false}
+    a.next() // Object{value:NaN, done:false}
+    a.next() // Object{value:NaN, done:true}
+
+    var b = foo(5);
+    b.next() // { value:6, done:false }
+    b.next(12) // { value:8, done:false }
+    b.next(13) // { value:42, done:true }
+
+    function* foo() {
+        yield 1;
+        yield 2;
+        yield 3;
+        yield 4;
+        yield 5;
+        return 6;
+    }
+
+    for (let v of foo()) {
+        console.log(v);
+    }// 1 2 3 4 5/  /，一旦next方法的返回对象的done属性为true，for...of循环就会中止，且不包含该返回对象
+
+
+
+</script>
+</body>
+</html>
