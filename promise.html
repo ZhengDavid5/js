@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script >
+//    //练习  如何捕捉异常
+//     let one =new Promise((resove,reject)=>{
+//        console.log(100000)
+//        setTimeout(()=>{
+//            try {
+//                throw new Error('test');//reject(new Error("fail"))  一样
+//            } catch(e) {
+//                reject(e);
+//            }
+//        },5000)
+////setTimeout  第一个参数只接受方法
+//    })
+//    let two =new  Promise((resolve,reject)=>{
+//        setTimeout(()=>{resolve(one)},1000)
+//    })
+//    two.then((result)=>{
+//        console.log(result)
+//    }).catch((result)=>{
+//        debugger
+//        console.log(result)
+//    })
+
+    //练习数组
+    let  promise=[1,2,3,4,5].map((x)=>{
+        if(x==2){
+            return  new Promise((resolve,reject)=>{
+                resolve("hello")
+            })
+
+        }else {
+            return  x*2
+
+        }
+    })
+     Promise.all(promise).then(data=>{
+         console.log(data)
+     })
+      console.log(promise.toString())
+
+
+</script>
+</body>
+</html>
