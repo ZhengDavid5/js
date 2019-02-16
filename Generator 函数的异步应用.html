@@ -91,8 +91,49 @@ return data.json();</br>
 }).then(function(data){</br>
 g.next(data);</br>
 });</br>
-4.  thunk 函数
+4.  thunk 函数</br>
+Thunk 函数替换的不是表达式，而是多参数函数，将其替换成一个只接受回调函数作为参数的单参数函数。</br>
 
+简易的demo</br>
+fs.readFile(fileName, callback);</br>
+// Thunk版本的readFile（单参数版本）</br>
+var Thunk = function (fileName) {</br>
+return function (callback) {</br>
+return fs.readFile(fileName, callback);</br>
+};</br>
+};</br>
+var readFileThunk = Thunk(fileName);</br>
+readFileThunk(callback);</br>
+<script>
+    //Thrunk函数转换器
+    // ES5版本
+    var Thunk = function(fn){
+        return function (){
+            var args = Array.prototype.slice.call(arguments);
+            return function (callback){
+                args.push(callback);
+                return fn.apply(this, args);
+            }
+        };
+    };
+    // ES6版本
+    const Thunk = function(fn) {
+        return function (...args) {
+            return function (callback) {
+                return fn.call(this, ...args, callback);
+            }
+        };
+    };
+
+    function f(a, cb) {
+        cb(a);
+    }
+    const ft = Thunk(f);
+    ft(1)(console.log) // 1
+</script>
+Thunkify 模块
+生产环境的转换器，建议使用 Thunkify 模块。
+$ npm install thunkify
 
 
 </body>
