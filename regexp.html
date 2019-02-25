@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        p{ white-space: pre-line;}
+    </style>
+</head>
+<body>
+<p>
+    一.RegExp 构造函数
+      参数有两种情况
+      1.第一种情况: 第一个是字符串 第二个表达式表示正则表达式的修饰符//demo 1
+      2.第二种情况:正则表达式   返回一个原有正则表达式的拷贝 //demo2
+      es5不支持第二个参数添加修饰符
+      es6支持  第二个参数是修饰符的话，会忽略原有的正则表达式的修饰符，只使用指定的修饰符
+
+</p>
+<script>
+     //demo1
+     {
+         let  regex1=new RegExp('xyz','i')
+         let regex1_0=/xyz/i
+
+     }
+     //demo2
+     {
+         let  regex1=new RegExp(/xyz/,'i')
+         let  regex2=new RegExp(/xyz/ig,'i')//所有的正则对象的修饰符为ig  会被第二个参数i覆盖
+     }
+</script>
+<p>
+    二.字符串的正则方法
+    match()、replace()、search()和split()
+    String.prototype.match 调用 RegExp.prototype[Symbol.match]
+    String.prototype.replace 调用 RegExp.prototype[Symbol.replace]
+    String.prototype.search 调用 RegExp.prototype[Symbol.search]
+    String.prototype.split 调用 RegExp.prototype[Symbol.split]
+</p>
+<script>
+    {
+        console.log("==============2222222222222")
+          let regex=new RegExp('xyz','i')
+         console.log('xyzxxx'.match(regex))//["xyz", index: 0, input: "xyzxxx", groups: undefined]
+        console.log('xyzxxx'.split(regex))//(2) ["", "xxx"]
+    }
+</script>
+<p>
+    三.u修饰符
+     含义为“Unicode 模式”，用来正确处理大于\uFFFF的 Unicode 字符。也就是说，会正确处理四个字节的 UTF-16 编码。
+   //暂未了解
+    1234暂不处理
+    5.y修饰符    粘连（sticky）修饰符
+    y修饰符的作用与g修饰符类似，也是全局匹配，后一次匹配都从上一次匹配成功的下一个位置开始。不同之处在于，g修饰符只要剩余位置中存在匹配就可，
+    而y修饰符确保匹配必须从剩余的第一个位置开始，这也就是“粘连”的涵义。
+</p>
+<script>
+    {
+        console.log("==============33333333333333")
+        let  s = '𠮷';
+        console.log(/\^.$/.test(s))   // false
+        console.log(/\^.$/u.test(s))// true
+    }
+    {
+        console.log("==============33333333333333  demo5")
+        let  s='aaa_aa_a'
+        let  r1=/a+/g
+        let  r2=/a+/y
+
+        console.log( r1.exec(s))//["aaa", index: 0, input: "aaa_aa_a", groups: undefined]
+        // exec() 方法还返回两个属性。index 属性声明的是匹配文本的第一个字符的位置。input 属性则存放的是被检索的字符串 string。
+        console.log( r1.lastIndex)//3
+        console.log( r1.exec(s))//
+        console.log( r2.exec(s))//["aaa", index: 0, input: "aaa_aa_a", groups: undefined]
+        console.log( r2.exec(s))
+    }
+</script>
+</body>
+</html>
