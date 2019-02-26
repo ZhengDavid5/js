@@ -181,7 +181,10 @@
    </script>
 <p>
     四.name 属性
-    函数的name属性,返回该函数的函数名
+    1.函数的name属性,返回该函数的函数名
+    2.如果将一个匿名函数赋值给一个变量，ES5 的name属性，会返回空字符串，而 ES6 的name属性会返回实际的函数名。
+    3.Function构造函数返回的函数实例，name属性的值为anonymous。
+    4.bind返回的函数，name属性值会加上bound前缀。
 </p>
 <script>
     //name 属性
@@ -190,9 +193,16 @@
         //正常返回
         function foo() {}
        console.log(foo.name) // "foo"
-        //
+        //匿名函数赋值给一个变量
         var f = function () {};
-        console.log(f.name)
+        console.log(f.name)//f
+        //name属性的值为anonymous
+        console.log((new Function).name)//anonymous
+        //bind返回的函数
+        function foo2() {};
+        console.log(foo2.bind({}).name) // "bound foo2"
+        console.log((function(){}).bind({}).name)  // "bound "
+
     }
 
 </script>
