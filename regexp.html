@@ -68,11 +68,15 @@
         let  r1=/a+/g
         let  r2=/a+/y
 
-        console.log( r1.exec(s))//["aaa", index: 0, input: "aaa_aa_a", groups: undefined]
-        // exec() 方法还返回两个属性。index 属性声明的是匹配文本的第一个字符的位置。input 属性则存放的是被检索的字符串 string。
-        console.log( r1.lastIndex)//3
+        console.log("==============33333333333333  demo6")
+
+
         console.log( r1.exec(s))//
-        console.log( r2.exec(s))//["aaa", index: 0, input: "aaa_aa_a", groups: undefined]
+        console.log( r2.exec(s))//
+        // exec() 方法还返回两个属性。index 属性声明的是匹配文本的第一个字符的位置。input 属性则存放的是被检索的字符串 string。
+
+
+        console.log( r1.exec(s))
         console.log( r2.exec(s))
     }
 </script>
