@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        p{ white-space: pre-line;}
+    </style>
+</head>
+<body>
+<p>
+ 一  函数参数的默认值
+    1.基本用法
+    2.参数默认值是惰性求值得  每次调用函数都会重新计算x+1
+    3.与解构赋值的默认值结合使用
+    4.参数的默认位置   通常定义默认值得参数  放在函数的尾参数
+    5.函数的length属性  将返回没有指定默认值得参数个数
+    6.作用域
+    7. 应用
+</p>
+<script>
+    //默认值的写的方式  基本用法
+    {
+        function log(x,y='word') {
+         console.log(x,y)
+        }
+        log('hello')//hello word
+    }
+    //惰性求值
+    {
+        let  x=0
+        function test(p=x+1) {
+          console.log(p)
+        }
+        test()//1
+         x=1
+        test()//2
+    }
+    //与结构结合
+    {
+        console.log("=========与结构结合")
+       function   test(x,y=5) {
+           console.log(x,y)
+       }
+        test({})
+        test({x:20,y:2})
+        //参数的默认值是空的对象
+        function m1({x = 1, y = 1} = {}) {
+            return [x, y];
+        }
+        //参数的默认值是一个有具体属性的对象，但是设置对象结构赋值的默认值  没有对x  y赋值
+        function m2({x, y} = { x: 1, y: 1 }) {
+            return [x, y];
+        }
+        console.log("111111111")
+        //函数没有参数的情况
+        console.log(m1())//[1,1]
+        console.log(m2())//[1,1]
+        console.log("222222222")
+        //x y都有值的情况
+        console.log(m1({x: 3, y: 8})) // [3, 8]
+        console.log(m2({x: 3, y: 8})) // [3, 8]
+        console.log("333333333")
+        // x有值 y没值
+        console.log(m1({x: 3})) // [3, 1]
+        console.log(m2({x: 3})) // [3, undefined]
+        console.log("4444")
+        //x,y 都没有值
+        console.log(m1({})) // [1, 1]
+        console.log(m2({})) // [undefined, undefined]
+    }
+    //函数的length
+    {
+//        console.log((function (a) {}).length) ;  // 1
+//         console.log((function (a = 5) {})).length ;// 0
+//        (function (a, b, c = 5) {}).length; // 2
+    }
+     //作用域
+    {
+        console.log("==========作用域=============")
+        let  foo='outer';
+       // 匿名函数里面的foo指向函数外层  j箭头函数
+        //函数参数形成的单独作用域里面，并没有定义变量foo，所以foo指向外层的全局变量foo，因此输出outer。
+        function  bar(func=()=>foo+'test') {
+            let foo='inner';
+            console.log(func())
+        }
+        console.log(foo)
+        bar()//outer
+        function  bar2(func=(foo)=>foo) {
+            let foo='inner';
+            console.log(func(foo))
+        }
+        bar2()//inner
+    }
+    {
+        console.log("==========作用域222=============")
+        let x = '1';
+        function foo(x, y = function() { x = '2'; }) {
+            x = '3';
+            y();
+            console.log(x);
+        }
+
+        foo() // 2
+       console.log(x) // 1
+    }
+    //应用
+    {
+        console.log("==========应用=============")
+        function  throwError() {
+            throw  new Error("missParammter")
+        }
+        function test(param=throwError()) {
+            return  param
+        }
+        try{
+            test()//Error: missParammter
+        }catch (e){
+            console.log(e)
+        }
+
+    }
+</script>
+二.  rest函数
+1. ES6 引入 rest 参数（形式为...变量名），用于获取函数的多余参数，这样就不需要使用arguments对象了。
+   rest 参数搭配的变量是一个数组，该变量将多余的参数放入数组中。
+2.rest 参数之后不能再有其他参数（即只能是最后一个参数） 否则会报错
+<script>
+    //获取多余参数
+    {
+        function add(...value) {
+            let sum=0
+            for (let a  of value){
+                sum+=a
+            }
+            return sum
+        }
+      console.log(add(1,2,3))
+    }
+    //获取替换arguments变量
+    {
+        function sortNumbers1() {
+            console.log(Array.prototype.slice.call(arguments).sort())
+        }
+        function sortNumbers2(...numbers) {
+            console.log(numbers.sort())
+        }
+       // rest参数的写法
+        sortNumbers1(3,1,2)
+        sortNumbers2(4,6,5)
+    }
+</script>
+<p>
+三.严格模式
+   es6  只要函数参数使用默认,解构赋值,或者扩展运算符那么函数内部
+   就不能显式设定为严格模式，否则会报错
+   原因：参数使用默认时 函数执行的时候，先执行函数参数，然后再执行函数体。
+         但是只有从函数体中，才能知道参数是否应该以严格模式执行，但是参数却应该先于函数体执行
+   解决方式
+         第一种是设定全局性的严格模式，这是合法的。
+         第二种是把函数包在一个无参数的立即执行函数里面
+</p>
+   <script>
+       //严格模式test
+        function doSome(a,b=a) {
+               //   'use strict'//使用便会报错
+           }
+        //解决方式一
+           'use strict';
+           function doSomething(a, b = a) {
+               // code
+           }
+       //解决方式二
+       const doSomething2 = (function () {
+           'use strict';
+           return function(value = 42) {
+               return value;
+           };
+       }());
+   </script>
+<p>
+    四.name 属性
+    函数的name属性,返回该函数的函数名
+</p>
+<script>
+    //name 属性
+    {
+        console.log("===========name 属性")
+        //正常返回
+        function foo() {}
+       console.log(foo.name) // "foo"
+        //
+        var f = function () {};
+        console.log(f.name)
+    }
+
+</script>
+</body>
+</html>
