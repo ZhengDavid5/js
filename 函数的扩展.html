@@ -206,5 +206,87 @@
     }
 
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<p>
+    尾递归优化的实现
+    尾递归优化只在严格模式下生效，在不支持的环境中，通过将递归改成循环的方式
+</p>
+<script>
+    console.log("尾递归优化的实现")
+    //递归调用
+//    function sum(x, y) {
+//        if (y > 0) {
+//            return sum(x + 1, y - 1);
+//        } else {
+//            return x;
+//        }
+//    }
+//
+//    sum(1, 100000)//Uncaught RangeError: Maximum call stack size exceeded
+
+</script>
+<script>
+    //递归更改为蹦床函数执行  避免出现堆栈溢出
+    {
+        //蹦床函数将递归执行转为循环执行
+        function trampoline(f) {
+            while (f && f instanceof Function) {
+                f = f();
+            }
+            return f;
+        }
+        function sum(x, y) {
+            if (y > 0) {
+                return sum.bind(null, x + 1, y - 1);
+            } else {
+                return x;
+            }
+        }
+    }
+   console.log(trampoline(sum(1, 100000)))
+</script>
+<script>
+
+</script>
+
 </body>
 </html>
