@@ -184,6 +184,7 @@
 <p>
 四.    es5   Object.getOwnPropertyDescriptor()  会返回某个对象属性的描述对象  某个单个的
        es6   Object.getOwnPropertyDescriptors()  返回指定对下个所有自身属性(非继承属性的描述对象)
+       //暂时没有纳入reflect  后面也会加入reflect
        目的  主要是为了解决Object.assign()无法正确拷贝get属性和set属性的问题。  所有的
 </p>
 <script>
@@ -259,13 +260,172 @@
         //{get: undefined, set: ƒ, enumerable: true, configurable: true}
     }
      //用途二  是配合Object.create()方法，将对象属性克隆到一个新对象
+     //这属于浅拷贝。
+    {
+        let obj = {
+            foo: 123,
+            get bar() { return 'abc' }
+        };
+        let clone = Object.create(Object.getPrototypeOf(obj),
+            Object.getOwnPropertyDescriptors(obj));
+        console.log(clone)
+       //{foo: 123}bar: "abc"foo: 123get bar: ƒ bar()arguments: (...)caller: (...)length: 0name: "get bar"__proto__: ƒ ()
+      //或者 换箭头函数写法
+        let shallowClone = (obj) => Object.create(
+            Object.getPrototypeOf(obj),
+            Object.getOwnPropertyDescriptors(obj)
+        );
+    }
+    //实现继承一个对象
+    {
+        let prot={a:1}
+        //es6之前
+        let  obj = {
+            __proto__: prot,
+            foo: 123,
+        };
+        //foo: 123  __proto__ : a:1
+        //实现继承的方式一
+        let temp=Object.create(prot)//__proto__ : a:1
+        let obj1= Object.assign(Object.create(prot),{
+            foo:123
+        })
+        //实现继承的方式二
+        let obj2 = Object.create(
+            prot,
+            Object.getOwnPropertyDescriptors({
+                foo: 123,
+            })
+        );//foo: 123  __proto__ : a:1
 
+    }
+    // 简单了解了下with函数 https://blog.csdn.net/zwkkkk1/article/details/79725934
+    //with函数尽量避免
     {
 
+    }
+</script>
+
+<p>
+五.  __proto__属性，Object.setPrototypeOf()，Object.getPrototypeOf()
+1.__proto__属性
+用来读取或设置当前对象的prototype对象
+是__proto__前后的双下划线，说明它本质上是一个内部属性，而不是一个正式的对外的 API
+只有浏览器必须部署这个属性，其他运行环境不一定需要部署，而且新的代码最好认为这个属性是不存在
+一般使用Object.setPrototypeOf()（写操作）、Object.getPrototypeOf()（读操作）、Object.create()（生成操作）代替
+实际上  __proto__调用的是Object.prototype.__proto__
+一个对象本身部署了__proto__属性，该属性的值就是对象的原型。
+ 2.Object.setPrototypeOf()
+    返回参数对象本身   ES6 正式推荐的设置原型对象的方法。
+    Object.setPrototypeOf(object, prototype)
+    注意点
+      1.undefined和null无法转为对象  会报错
+      2.如果第一个参数不是对象，会自动转为对象。但是由于返回的还是第一个参数，所以这个操作不会产生任何效果。
+ 3.Object.getPrototypeOf()
+    用于读取一个对象的原型对象。
+ 4.  Object.keys()，Object.values()，Object.entries()
+     Object.keys()    返回一个数组  成员是参数对象自身的(不含继承)的所有可遍历属性的键名
+     Object.values()   方法返回一个数组，成员是参数对象自身的（不含继承的）所有可遍历（enumerable）属性的键值。
+      注意点
+      1.Object.create方法的第二个参数添加的对象属性（属性p），如果不显式声明，默认是不可遍历的， 所以keys遍历不了
+      2.会过滤属性名为 Symbol 值的属性。
+      3.如果Object.values方法的参数是一个字符串，会返回各个字符组成的一个数组。因为会默认转成对象对象
+     Object.entries()  方法返回一个数组，成员是参数对象自身的（不含继承的）所有可遍历（enumerable）属性的键值对数组
+       除了返回值不一样，该方法的行为与Object.values基本一致。
+      //Reflect 暂时没有
+       基本用途  1.用来遍历对象的属性
+                 2. 遍历对象的属性
+  5.Object.fromEntries()
+    Object.fromEntries()方法是Object.entries()的逆操作，用于将一个键值对数组转为对象。
+    该方法的主要目的，是将键值对的数据结构还原为对象，因此特别适合将 Map 结构转为对象。
+</p>
+<script>
+    //  __proto__调用的是Object.prototype.__proto__  具体实现的方式
+    {
+        Object.defineProperty(Object.prototype, '__proto__', {
+            get() {
+                let _thisObj = Object(this);
+                return Object.getPrototypeOf(_thisObj);
+            },
+            set(proto) {
+                if (this === undefined || this === null) {
+                    throw new TypeError();
+                }
+                if (!isObject(this)) {
+                    return undefined;
+                }
+                if (!isObject(proto)) {
+                    return undefined;
+                }
+                let status = Reflect.setPrototypeOf(this, proto);
+                if (!status) {
+                    throw new TypeError();
+                }
+            },
+        });
+    }
+
+    //设置原型
+    {
+       let  proto={}
+       let obj={x:30}
+      let obj2=  Object.setPrototypeOf(obj,proto)
+        //obj   x:30   返回参数对象本身
+        proto.y=20
+        proto.z=10
+        obj.x//30
+        obj.y//20
+        obj.z//10
+        Reflect.getPrototypeOf(obj)//y: 20    z: 10   说明x 的定义是在实例上
+    }
+    //Object.keys()
+    {
+        let obj = { foo: 'bar', baz: 42 };
+        Object.keys(obj)// ["foo", "baz"]
+        let obj1 = { a: 1, b: 2, c: 3 };
+        for (let key of Object.keys(obj1)) {
+            console.log(key); // 'a', 'b', 'c'
+        }
 
     }
 
+    //Object.value()
+    {  //demo
+        const obj = { 100: 'a', 2: 'b', 7: 'c' };
+        Object.values(obj)// ["b", "c", "a"]
+
+       //Object.create方法的第二个参数添加的对象属性（属性p），如果不显式声明，默认是不可遍历的，
+        // 只要把enumerable改成true，Object.values就会返回属性p的值。
+         let obj2=Object.create({},{p:{value:3}})
+         Object.values(obj2)//[]
+        let obj3=Object.create({},{p:{value:3}})
+        Object.values(obj3)//[3]
+        //过滤Symbol的值的属性
+        Object.values({ [Symbol()]: 123, foo: 'abc' });// ['abc']
+    }
+
+    //Object.entries()
+    {
+        let obj3 = { foo: 'bar', baz: 42 };
+        Object.entries(obj3)//// [ ["foo", "bar"], ["baz", 42] ]
+        //遍历对象
+         let obj4={one:1,two:2}
+         for(let [k,v] of Object.entries(obj4)){
+            console.log(k,v)// one 1 two: 2
+         }
+        //将对象转为map结构
+        let obj6 = { foo: 'bar', baz: 42 };
+        let  map = new Map(Object.entries(obj6));
+    }
+    {
+      let a=   ()=>{
+         console.log("=======")
+        }
+        let enteries=new Map([['foo',22],[1,2]])
+        Object.fromEntries(enteries)// Object.fromEntries is not a function
+    }
 
 </script>
+
 </body>
 </html>
